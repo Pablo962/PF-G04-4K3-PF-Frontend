@@ -17,7 +17,6 @@ Simulación de eventos discretos de una planta de recuperación de equipos elect
 7. [Tablas del simulador](#7-tablas-del-simulador)
 8. [Umbrales de decisión](#8-umbrales-de-decisión)
 9. [Instalación y ejecución local](#9-instalación-y-ejecución-local)
-10. [Despliegue (Netlify + Render)](#10-despliegue-netlify--render)
 
 ---
 
@@ -655,34 +654,6 @@ npm install
 npm run dev          # Inicia en http://localhost:5173
 ```
 
-La variable `VITE_API_BASE` no es necesaria en desarrollo local: el hook apunta por defecto a `http://localhost:3001/api`.
-
----
-
-## 10. Despliegue (Netlify + Render)
-
-### Backend → Render
-
-| Campo | Valor |
-|-------|-------|
-| Runtime | Node |
-| Build Command | `npm install` |
-| Start Command | `npm start` |
-| Variable de entorno | `NODE_ENV=production` |
-
-### Frontend → Netlify
-
-| Campo | Valor |
-|-------|-------|
-| Build Command | `npm run build` |
-| Publish Directory | `dist` |
-| Variable de entorno | `VITE_API_BASE=https://<tu-servicio>.onrender.com/api` |
-
-> ⚠️ **Importante**: en Netlify, las variables `VITE_*` solo se inyectan en tiempo de build. Después de configurar la variable, es necesario triggerear un nuevo deploy desde el panel de Netlify.
-
-El archivo `netlify.toml` en la raíz del frontend configura automáticamente el redirect SPA necesario para que todas las rutas sirvan `index.html`.
-
----
 
 ## Stack tecnológico
 
