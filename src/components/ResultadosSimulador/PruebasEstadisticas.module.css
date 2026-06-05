@@ -1,0 +1,204 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Encabezado ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--bg-inner);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.headerSub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.scoreBox {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.scoreNum {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scoreLbl {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.scorePct {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ── Barra de progreso ── */
+.progressBar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+/* ── Nota ── */
+.nota {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: rgba(0, 212, 200, 0.04);
+  border: 1px solid var(--border-teal);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  line-height: 1.6;
+}
+
+.mono {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  color: var(--teal);
+}
+
+/* ── Grid de tarjetas ── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Tarjeta individual ── */
+.card {
+  background: var(--bg-inner);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.cardOk   { border-left: 3px solid #22c55e; }
+.cardFail { border-left: 3px solid #ef4444; }
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cardIcon { flex-shrink: 0; }
+
+.cardTitle {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.badgeOk   { background: rgba(34,197,94,0.12);  color: #22c55e; }
+.badgeFail { background: rgba(239,68,68,0.12);  color: #ef4444; }
+
+.desc {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.formulaBox {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 0.7rem;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  border: 1px solid rgba(0,212,200,0.15);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.detalle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* ── Mini-histograma de frecuencias ── */
+.freqRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.freqCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 24px;
+}
+
+.freqVal {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+}
+
+.freqLbl {
+  font-size: 0.58rem;
+  color: var(--text-dim);
+}
+
+@media (max-width: 820px) {
+  .grid { grid-template-columns: 1fr; }
+}

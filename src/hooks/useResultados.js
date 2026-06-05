@@ -6,7 +6,9 @@ const TABS = [
   { id: 'grilla',    label: 'Grilla de eventos' },
   { id: 'decisiones',label: 'Decisiones' },
   { id: 'generador', label: 'Generador' },
+  { id: 'pruebas',   label: 'Pruebas Estadísticas' },
 ]
+
 
 export function useResultados(datos) {
   const [tabActivo, setTabActivo] = useState('resumen')

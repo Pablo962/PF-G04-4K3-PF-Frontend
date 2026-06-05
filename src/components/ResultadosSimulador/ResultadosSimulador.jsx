@@ -17,7 +17,8 @@ import DesgloseDiario     from './DesgloseDiario'
 import GrillaEventos      from './GrillaEventos'
 import DecisionesDetalle  from './DecisionesDetalle'
 import HistogramaGenerador from './HistogramaGenerador'
-import GlosarioVariables  from './GlosarioVariables'
+import GlosarioVariables      from './GlosarioVariables'
+import PruebasEstadisticas    from './PruebasEstadisticas'
 
 const ResultadosSimulador = ({ datos, onEjecutar, onReiniciar }) => {
   const {
@@ -59,7 +60,7 @@ const ResultadosSimulador = ({ datos, onEjecutar, onReiniciar }) => {
     )
   }
 
-  const { dias, resumen, decisiones, methodName, seed, seedWasRandom, grilla, rng } = datos
+  const { dias, resumen, decisiones, methodName, seed, seedWasRandom, grilla, rng, pruebasEstadisticas } = datos
 
   const renderTab = () => {
     switch (tabActivo) {
@@ -115,6 +116,9 @@ const ResultadosSimulador = ({ datos, onEjecutar, onReiniciar }) => {
 
       case 'generador':
         return <HistogramaGenerador grilla={grilla} rng={rng} />
+
+      case 'pruebas':
+        return <PruebasEstadisticas pruebasEstadisticas={pruebasEstadisticas} />
 
       default:
         return null
