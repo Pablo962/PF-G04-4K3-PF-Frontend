@@ -1,11 +1,7 @@
 import React from 'react'
 import ParametrosAvanzados from './ParametrosAvanzados'
 import styles from './EntradasSimulador.module.css'
-import {
-  useEntradasSimulador,
-  PARAM_LABELS,
-  PARAM_HINTS,
-} from '../../hooks/useEntradasSimulador'
+import { useEntradasSimulador } from '../../hooks/useEntradasSimulador'
 
 import {
   Server, Network, Laptop,
@@ -19,19 +15,21 @@ import {
 const FORMULA = {
   expr: 'Xₙ₊₁ = ( a · Xₙ + c ) mod m',
   vars: [
-    { key: 'a',  desc: 'Multiplicador',   constraint: 'e.g. 1664525' },
-    { key: 'c',  desc: 'Incremento (≠0)', constraint: 'e.g. 1013904223' },
-    { key: 'm',  desc: 'Módulo',          constraint: 'e.g. 4294967296 = 2³²' },
+    { key: 'a',  desc: 'Multiplicador' },
+    { key: 'c',  desc: 'Incremento' },
+    { key: 'm',  desc: 'Módulo' },
     { key: 'X₀', desc: 'Semilla: 0 ≤ X₀ < m' },
     { key: 'Uₙ', desc: 'Número aleatorio: Uₙ = Xₙ / m' },
   ],
-  note: 'Período máximo si: mcd(c, m) = 1; a − 1 divisible por todos los factores primos de m; y si 4 | m entonces 4 | (a − 1).',
+  note: 'Período máximo garantizado (Teorema de Hull-Dobell). Parámetros fijos validados estadísticamente.',
 }
 
-const inputStyle = (hasError) => ({
-  borderColor: hasError ? 'rgba(239,68,68,0.7)' : undefined,
-  boxShadow:   hasError ? '0 0 0 2px rgba(239,68,68,0.18)' : undefined,
-})
+/* ── Parámetros fijos del generador (glibc LCG, período = 2³¹) ── */
+const PARAMS_FIJOS = [
+  { key: 'a', label: 'Multiplicador', value: '1.103.515.245' },
+  { key: 'c', label: 'Incremento',   value: '12.345' },
+  { key: 'm', label: 'Módulo',       value: '2³¹ = 2.147.483.648' },
+]
 
 const blockInvalidKeys = (e) => {
   const ctrl = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','Enter']
@@ -42,9 +40,7 @@ const blockInvalidKeys = (e) => {
 const EntradasSimulador = ({ onEjecutar, onReiniciar, cargando, error }) => {
   const {
     semilla, semillaError, setSemilla,
-    params, paramErrors,
-    metodoInfo,
-    handleParamChange, handleEjecutar,
+    handleEjecutar,
   } = useEntradasSimulador(onEjecutar)
 
   return (
@@ -192,7 +188,7 @@ const EntradasSimulador = ({ onEjecutar, onReiniciar, cargando, error }) => {
             </div>
           </div>
 
-          {/* ══ Columna derecha: Parámetros del método + Semilla ══ */}
+          {/* ══ Columna derecha: Semilla + Parámetros fijos (solo lectura) ══ */}
           <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div className="card-title">
               <div className="card-title-icon" style={{ background: 'rgba(168,85,247,0.12)' }}>
@@ -209,7 +205,7 @@ const EntradasSimulador = ({ onEjecutar, onReiniciar, cargando, error }) => {
                 value={semilla}
                 onChange={e => setSemilla(e.target.value)}
                 onKeyDown={blockInvalidKeys}
-                placeholder="Vacío = semilla aleatoria (0 ≤ X₀ < m)"
+                placeholder="Vacío = semilla aleatoria (0 ≤ X₀ < 2³¹)"
                 style={semillaError ? { borderColor: 'rgba(239,68,68,0.7)', boxShadow: '0 0 0 2px rgba(239,68,68,0.18)' } : undefined}
               />
               {semillaError
@@ -218,29 +214,36 @@ const EntradasSimulador = ({ onEjecutar, onReiniciar, cargando, error }) => {
               }
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Parámetros fijos — solo lectura */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div className="section-sub">Parámetros del método</div>
-              {metodoInfo?.params.map(key => {
-                const hasError = !!paramErrors[key]
-                return (
-                  <div key={key} className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">{PARAM_LABELS[key]}</label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={params[key] ?? ''}
-                      onChange={e => handleParamChange(key, e.target.value)}
-                      onKeyDown={blockInvalidKeys}
-                      placeholder="Número positivo requerido"
-                      style={inputStyle(hasError)}
-                    />
-                    {hasError
-                      ? <span className={styles.inputError}>{paramErrors[key]}</span>
-                      : <span className="input-hint">{PARAM_HINTS[key]}</span>
-                    }
+              <div style={{
+                background: 'rgba(168,85,247,0.06)',
+                border: '1px solid rgba(168,85,247,0.15)',
+                borderRadius: 8,
+                padding: '10px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 7,
+              }}>
+                {PARAMS_FIJOS.map(({ key, label, value }) => (
+                  <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{label}</span>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                      color: '#a855f7',
+                      background: 'rgba(168,85,247,0.1)',
+                      padding: '2px 7px',
+                      borderRadius: 4,
+                    }}>{value}</span>
                   </div>
-                )
-              })}
+                ))}
+              </div>
+              <span className="input-hint" style={{ fontSize: '0.65rem' }}>
+                Parámetros fijos validados (glibc LCG) — período máximo 2³¹
+              </span>
             </div>
           </div>
 

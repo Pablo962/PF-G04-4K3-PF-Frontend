@@ -1,30 +1,21 @@
 import { useState, useRef, useEffect } from 'react'
 
+/* ── Módulo fijo del generador (igual al DEFAULT_LCG_PARAMS del backend) ── */
+export const M_FIJO = 2_147_483_648 // 2^31
+
 /* ── Único método RNG disponible ── */
 export const METODOS = [
-  { value: 'mixedCongruential', label: 'Congruencial Mixto (LCG)', params: ['a', 'c', 'm'] },
+  { value: 'mixedCongruential', label: 'Congruencial Mixto (LCG)' },
 ]
-
-export const PARAM_LABELS = {
-  a: 'Multiplicador (a)',
-  c: 'Incremento (c)',
-  m: 'Módulo (m)',
-}
-
-export const PARAM_HINTS = {
-  a: 'Factor multiplicativo del generador',
-  c: 'Constante aditiva (≠ 0)',
-  m: 'Módulo — espacio de estados',
-}
 
 export const isValidNumericInput = (str) =>
   str === '' || /^\d+\.?\d*$/.test(str)
 
-/** Número completo válido (no vacío, no NaN, > 0) */
-const isCompletePositive = (str) => {
+/** Número entero no negativo válido */
+const isNonNegativeInt = (str) => {
   if (str === '' || str == null) return false
-  const n = parseFloat(str)
-  return !isNaN(n) && n > 0
+  const n = Number(str)
+  return Number.isFinite(n) && n >= 0 && Math.floor(n) === n
 }
 
 export function useEntradasSimulador(onEjecutar) {
@@ -32,79 +23,52 @@ export function useEntradasSimulador(onEjecutar) {
   const onEjecutarRef = useRef(onEjecutar)
   useEffect(() => { onEjecutarRef.current = onEjecutar }, [onEjecutar])
 
-  const [semilla,     setSemillaState] = useState('')
+  const [semilla,      setSemillaState] = useState('')
   const [semillaError, setSemillaError] = useState('')
-  const [params,      setParams]       = useState({})
-  const [paramErrors, setParamErrors]  = useState({})
 
   // Método fijo: Congruencial Mixto
-  const metodo     = 'mixedCongruential'
-  const metodoInfo = METODOS[0]
+  const metodo = 'mixedCongruential'
 
-  /* ── Semilla: solo positivos o vacío (aleatoria al ejecutar) ── */
+  /* ── Semilla: solo enteros no negativos o vacío (aleatoria al ejecutar) ── */
   const setSemilla = (val) => {
     if (isValidNumericInput(val)) {
       setSemillaState(val)
-      // Limpiar error de semilla al editar
       setSemillaError('')
     }
   }
 
-  const handleParamChange = (key, val) => {
-    if (!isValidNumericInput(val)) return
-
-    setParams(prev => ({ ...prev, [key]: val }))
-
-    // Limpiar error cuando el campo queda válido o vacío
-    if (val === '' || isCompletePositive(val)) {
-      setParamErrors(prev => {
-        const next = { ...prev }
-        delete next[key]
-        return next
-      })
-    }
-  }
-
   const validate = () => {
-    const errors = {}
-    metodoInfo.params.forEach(key => {
-      const val = params[key] ?? ''
-      if (!isCompletePositive(val)) {
-        errors[key] = 'Parámetro requerido — ingresá un número positivo'
-      }
-    })
-
-    setParamErrors(errors)
-
-    // Validar semilla manual contra el módulo m
-    if (isCompletePositive(semilla)) {
-      const seedVal = parseFloat(semilla)
-      const mVal    = parseFloat(params['m'] ?? '')
-      if (isCompletePositive(params['m']) && seedVal >= mVal) {
-        setSemillaError(`La semilla debe ser menor que el módulo m (${mVal.toLocaleString('es-AR')})`)
-        return false
-      }
+    // Si la semilla está vacía → se genera aleatoriamente, siempre válido
+    if (semilla === '') {
+      setSemillaError('')
+      return true
     }
-    setSemillaError('')
 
-    return Object.keys(errors).length === 0
+    if (!isNonNegativeInt(semilla)) {
+      setSemillaError('La semilla debe ser un número entero no negativo')
+      return false
+    }
+
+    const seedVal = parseInt(semilla, 10)
+    if (seedVal >= M_FIJO) {
+      setSemillaError(`La semilla debe ser menor que ${M_FIJO.toLocaleString('es-AR')} (= 2³¹)`)
+      return false
+    }
+
+    setSemillaError('')
+    return true
   }
 
   const buildPayload = () => {
-    const mergedParams = {}
-    Object.entries(params).forEach(([k, v]) => {
-      if (isCompletePositive(v)) mergedParams[k] = parseFloat(v)
-    })
+    const seedWasRandom = semilla === ''
 
-    const seedWasRandom = !isCompletePositive(semilla)
-
-    /* Semilla aleatoria: siempre en [0, m) para respetar el espacio de estados */
-    const m = parseFloat(params['m'] ?? '0')
+    /* Semilla aleatoria: en [0, M_FIJO) para respetar el espacio de estados */
     const seed = seedWasRandom
-      ? Math.floor(Math.random() * m)   // 0 ≤ seed < m
-      : parseFloat(semilla)
+      ? Math.floor(Math.random() * M_FIJO)
+      : parseInt(semilla, 10)
 
-    return { method: metodo, seed, seedWasRandom, params: mergedParams }
+    // No se envían params: el backend usa DEFAULT_LCG_PARAMS automáticamente
+    return { method: metodo, seed, seedWasRandom }
   }
 
   const handleEjecutar = () => {
@@ -117,10 +81,6 @@ export function useEntradasSimulador(onEjecutar) {
     semillaError,
     setSemilla,
     metodo,
-    params,
-    paramErrors,
-    metodoInfo,
-    handleParamChange,
     handleEjecutar,
   }
 }
